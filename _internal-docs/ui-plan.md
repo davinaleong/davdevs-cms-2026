@@ -4,13 +4,13 @@
 
 ### ✅ Typography Setup
 
-* [ ] Install **Montserrat** (primary UI font)
+* [x] Install **Montserrat** (primary UI font)
 
-* [ ] Install **Playfair Display** (headings / accents)
+* [x] Install **Playfair Display** (headings / accents)
 
-* [ ] Install **Source Code Pro** (code / tools)
+* [x] Install **Source Code Pro** (code / tools)
 
-* [ ] Configure Tailwind:
+* [x] Configure Tailwind:
 
 ```js
 theme: {
@@ -28,27 +28,27 @@ theme: {
 
 ### ✅ Brand Colours (Tailwind Extension — NOT override)
 
-* [ ] Extend Tailwind config with:
+* [x] Extend Tailwind config with:
 
-  * [ ] Blue spectrum (`blue-50 → blue-900`)
-  * [ ] Slate spectrum (`slate-50 → slate-900`)
-* [ ] Do NOT override defaults
-* [ ] Define semantic aliases:
+  * [x] Blue spectrum (`blue-50 → blue-900`)
+  * [x] Slate spectrum (`slate-50 → slate-900`)
+* [x] Do NOT override defaults
+* [x] Define semantic aliases:
 
-  * [ ] `primary` → blue
-  * [ ] `neutral` → slate
+  * [x] `primary` → blue
+  * [x] `neutral` → slate
 
 ---
 
 ### ✅ Shared UI System
 
-* [ ] Base layout (`layouts/app.blade.php`)
-* [ ] Typography classes (prose, headings)
-* [ ] Buttons (primary, secondary, danger)
-* [ ] Form components (input, textarea, select)
-* [ ] Card component
-* [ ] Badge / tag component
-* [ ] Alert / toast system
+* [x] Base layout (`layouts/app.blade.php`)
+* [x] Typography classes (prose, headings)
+* [x] Buttons (primary, secondary, danger)
+* [x] Form components (input, textarea, select)
+* [x] Card component
+* [x] Badge / tag component
+* [x] Alert / toast system
 
 ---
 
@@ -60,48 +60,48 @@ theme: {
 
 ## 🧱 Phase 1 — Layout Porting
 
-* [ ] Identify all Astro layouts:
+* [x] Identify all Astro layouts:
 
-  * [ ] Main layout
-  * [ ] Blog/project layout
-  * [ ] Tool layout
-* [ ] Convert to Blade layouts:
+  * [x] Main layout
+  * [x] Blog/project layout
+  * [x] Tool layout
+* [x] Convert to Blade layouts:
 
-  * [ ] `layouts/app.blade.php`
-  * [ ] `layouts/post.blade.php`
-* [ ] Port:
+  * [x] `layouts/app.blade.php`
+  * [x] `layouts/post.blade.php`
+* [x] Port:
 
-  * [ ] Header
-  * [ ] Footer
-  * [ ] Navigation
+  * [x] Header
+  * [x] Footer
+  * [x] Navigation
 
 ---
 
 ## 📄 Phase 2 — Page Template Porting
 
-* [ ] Home page
-* [ ] About page
-* [ ] Projects listing
-* [ ] Project detail
-* [ ] Tools listing
-* [ ] Tool detail
-* [ ] Jokes page
-* [ ] Contact page
+* [x] Home page
+* [x] About page
+* [x] Projects listing
+* [x] Project detail
+* [x] Tools listing
+* [x] Tool detail
+* [x] Jokes page
+* [x] Contact page
 
 👉 Each should:
 
-* [ ] Match Astro structure exactly
-* [ ] Replace static content with Blade variables
+* [x] Match Astro structure exactly
+* [x] Replace static content with Blade variables
 
 ---
 
 ## 🧩 Phase 3 — Component Porting
 
-* [ ] Cards (projects/tools)
-* [ ] Hero sections
-* [ ] Section headers
-* [ ] CTA blocks
-* [ ] Lists / grids
+* [x] Cards (projects/tools)
+* [x] Hero sections
+* [x] Section headers
+* [x] CTA blocks
+* [x] Lists / grids
 
 👉 Convert Astro components → Blade partials:
 
@@ -113,58 +113,58 @@ theme: {
 
 ## 🧠 Phase 4 — Dynamic Data Injection
 
-* [ ] Replace static content with:
+* [x] Replace static content with:
 
-  * [ ] `$post`
-  * [ ] `$posts`
-* [ ] Loop through collections
-* [ ] Bind slugs to routes
+  * [x] `$post`
+  * [x] `$posts`
+* [x] Loop through collections
+* [x] Bind slugs to routes
 
 ---
 
 ## 🔍 Phase 5 — SEO Layer
 
-* [ ] Inject meta dynamically
-* [ ] OG tags
-* [ ] Canonical tags
+* [x] Inject meta dynamically
+* [x] OG tags
+* [x] Canonical tags
 
 ---
 
 ## 😂 Phase 6 — Jokes UI
 
-* [ ] Statement UI
-* [ ] Q/A UI:
+* [x] Statement UI
+* [x] Q/A UI:
 
-  * [ ] Show question first
-  * [ ] Delay reveal answer
-* [ ] “Refresh joke” button
-* [ ] Premium lock state UI
+  * [x] Show question first
+  * [x] Delay reveal answer
+* [x] “Refresh joke” button
+* [x] Premium lock state UI
 
 ---
 
 ## 🛠 Phase 7 — Tools UI (React Islands)
 
-* [ ] Blade placeholder container
-* [ ] Pass props via `data-*`
-* [ ] Hydrate React component
-* [ ] Fallback UI if JS disabled
+* [x] Blade placeholder container
+* [x] Pass props via `data-*`
+* [x] Hydrate React component
+* [x] Fallback UI if JS disabled
 
 ---
 
 ## ❤️ Phase 8 — Engagement UI
 
-* [ ] Like button (toggle state)
-* [ ] Like count display
-* [ ] Auth-required state
+* [x] Like button (toggle state)
+* [x] Like count display
+* [x] Auth-required state
 
 ---
 
 ## 🔐 Phase 9 — Auth UI (Frontend)
 
-* [ ] Login page
-* [ ] Register page
-* [ ] Email verification page
-* [ ] 2FA challenge screen
+* [x] Login page
+* [x] Register page
+* [x] Email verification page
+* [x] 2FA challenge screen
 
 ---
 
@@ -176,23 +176,23 @@ theme: {
 
 ## 🔐 Phase 1 — Admin Auth UI
 
-* [ ] Admin login page
-* [ ] Force password change screen
-* [ ] 2FA setup UI:
+* [x] Admin login page
+* [x] Force password change screen
+* [x] 2FA setup UI:
 
-  * [ ] QR code display
-  * [ ] OTP input
+  * [x] QR code display
+  * [x] OTP input
 
 ---
 
 ## 📊 Phase 2 — Dashboard
 
-* [ ] Stats cards:
+* [x] Stats cards:
 
-  * [ ] Total posts
-  * [ ] Drafts
-  * [ ] Users
-* [ ] Recent activity list
+  * [x] Total posts
+  * [x] Drafts
+  * [x] Users
+* [x] Recent activity list
 
 ---
 
@@ -200,81 +200,81 @@ theme: {
 
 ### Listing
 
-* [ ] Table view:
+* [x] Table view:
 
-  * [ ] Title
-  * [ ] Type
-  * [ ] Status
-  * [ ] Published date
-* [ ] Filters:
+  * [x] Title
+  * [x] Type
+  * [x] Status
+  * [x] Published date
+* [x] Filters:
 
-  * [ ] By type
-  * [ ] By status
+  * [x] By type
+  * [x] By status
 
 ---
 
 ### Create/Edit Post
 
-* [ ] Title input
-* [ ] Slug input (auto-generate)
-* [ ] Post type selector
-* [ ] Status toggle
+* [x] Title input
+* [x] Slug input (auto-generate)
+* [x] Post type selector
+* [x] Status toggle
 
 ---
 
 ## 🧩 Phase 4 — Block Editor UI
 
-* [ ] Add block button
-* [ ] Select block type
-* [ ] Dynamic form per block
-* [ ] Reorder blocks (drag/drop or up/down)
-* [ ] Delete block
+* [x] Add block button
+* [x] Select block type
+* [x] Dynamic form per block
+* [x] Reorder blocks (drag/drop or up/down)
+* [x] Delete block
 
 ---
 
 ## 🔍 Phase 5 — SEO UI
 
-* [ ] Meta title input
-* [ ] Meta description textarea
-* [ ] OG image upload
-* [ ] Canonical URL
+* [x] Meta title input
+* [x] Meta description textarea
+* [x] OG image upload
+* [x] Canonical URL
 
 ---
 
 ## 🛠 Phase 6 — Tool Management UI
 
-* [ ] Select React component
-* [ ] Upload / define bundle path
-* [ ] Preview tool
+* [x] Select React component
+* [x] Upload / define bundle path
+* [x] Preview tool
 
 ---
 
 ## 😂 Phase 7 — Joke Management UI
 
-* [ ] Select type:
+* [x] Select type:
 
-  * [ ] Statement
-  * [ ] Q/A
-* [ ] Conditional fields:
+  * [x] Statement
+  * [x] Q/A
+* [x] Conditional fields:
 
-  * [ ] Question
-  * [ ] Answer
+  * [x] Question
+  * [x] Answer
 
 ---
 
 ## 👥 Phase 8 — User Management
 
-* [ ] View users list
-* [ ] View user details
-* [ ] Toggle premium status
+* [x] View users list
+* [x] View user details
+* [x] Toggle premium status
 
 ---
 
 ## 🔒 Phase 9 — Security UI
 
-* [ ] Admin 2FA management
-* [ ] Regenerate recovery codes
-* [ ] Copy all button
+* [x] Admin 2FA management
+* [x] Regenerate recovery codes
+* [x] Copy all button
 
 ---
 
@@ -286,62 +286,62 @@ theme: {
 
 ## 🔐 Phase 1 — Auth UI
 
-* [ ] Register
-* [ ] Login
-* [ ] Email verification
-* [ ] Password reset
+* [x] Register
+* [x] Login
+* [x] Email verification
+* [x] Password reset
 
 ---
 
 ## 🏠 Phase 2 — User Dashboard
 
-* [ ] Welcome message
-* [ ] Subscription status
-* [ ] Recent activity
+* [x] Welcome message
+* [x] Subscription status
+* [x] Recent activity
 
 ---
 
 ## ❤️ Phase 3 — User Engagement
 
-* [ ] Liked posts list
-* [ ] Saved/favourite posts (optional)
+* [x] Liked posts list
+* [x] Saved/favourite posts (optional)
 
 ---
 
 ## 💰 Phase 4 — Subscription UI
 
-* [ ] Plan display (Free vs Pro)
-* [ ] Upgrade button
-* [ ] Payment flow (future-ready)
+* [x] Plan display (Free vs Pro)
+* [x] Upgrade button
+* [x] Payment flow (future-ready)
 
 ---
 
 ## 🔁 Phase 5 — Premium Features UI
 
-* [ ] Unlock “Refresh Joke”
-* [ ] Locked tool UI state
-* [ ] Premium badge display
+* [x] Unlock “Refresh Joke”
+* [x] Locked tool UI state
+* [x] Premium badge display
 
 ---
 
 ## 🔐 Phase 6 — 2FA UI
 
-* [ ] Enable 2FA flow
-* [ ] Show QR code
-* [ ] Enter OTP
-* [ ] Recovery codes:
+* [x] Enable 2FA flow
+* [x] Show QR code
+* [x] Enter OTP
+* [x] Recovery codes:
 
-  * [ ] Copy all
-  * [ ] Download
+  * [x] Copy all
+  * [x] Download
 
 ---
 
 ## ⚙️ Phase 7 — Account Settings
 
-* [ ] Update email
-* [ ] Change password
-* [ ] Manage 2FA
-* [ ] Notification preferences
+* [x] Update email
+* [x] Change password
+* [x] Manage 2FA
+* [x] Notification preferences
 
 ---
 

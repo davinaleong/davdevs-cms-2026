@@ -10,6 +10,7 @@
 - [x] Iteration 6 (2026-04-24): Hardened API authorization with reusable `admin` middleware and protected admin endpoints plus post write routes, with updated passing Pest coverage.
 - [x] Iteration 7 (2026-04-24): Implemented user/admin 2FA setup + OTP verification APIs with otpauth QR URI payloads, encrypted secret storage, hashed recovery code storage, and expanded passing Pest coverage.
 - [x] Iteration 8 (2026-04-24): Implemented 2FA recovery-code verification fallback, regeneration endpoints with copy-ready text payloads, and `.txt` download endpoints for users/admins with expanded passing Pest coverage.
+- [x] Iteration 9 (2026-04-24): Completed website/admin/user UI execution with unified Blade layouts, full web route wiring, admin CRUD screens, account settings/auth pages (including password reset UI), Tailwind theme updates, and passing Pest suite.
 
 **Goal: Set up a stable base you won’t regret later**
 

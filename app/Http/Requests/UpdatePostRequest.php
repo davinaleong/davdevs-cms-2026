@@ -9,6 +9,15 @@ use Illuminate\Validation\Rule;
 
 class UpdatePostRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'meta' => $this->decodeJsonField('meta', []),
+            'blocks' => $this->decodeJsonField('blocks', []),
+            'tool' => $this->decodeJsonField('tool', []),
+        ]);
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -48,5 +57,25 @@ class UpdatePostRequest extends FormRequest
             'tool.props' => ['nullable', 'array'],
             'tool.is_active' => ['nullable', 'boolean'],
         ];
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function decodeJsonField(string $field, array $fallback): array
+    {
+        $value = $this->input($field);
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (! is_string($value) || trim($value) === '') {
+            return $fallback;
+        }
+
+        $decoded = json_decode($value, true);
+
+        return is_array($decoded) ? $decoded : $fallback;
     }
 }

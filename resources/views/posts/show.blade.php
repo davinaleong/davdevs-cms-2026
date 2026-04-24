@@ -3,7 +3,7 @@
     $postTypeView = 'posts.' . $postType;
 @endphp
 
-@extends('layouts.app')
+@extends('layouts.post')
 
 @section('title', $post->meta?->meta_title ?? $post->title)
 @section('meta_description', $post->meta?->meta_description ?? $post->excerpt)
@@ -12,7 +12,7 @@
 @section('og_description', $post->meta?->meta_description ?? $post->excerpt)
 @section('og_image', $post->meta?->og_image ?? '')
 
-@section('content')
+@section('post_content')
     @if (view()->exists($postTypeView))
         @include($postTypeView, ['post' => $post])
     @else
