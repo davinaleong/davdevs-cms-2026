@@ -7,11 +7,14 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Models\User;
+use App\Notifications\NewPostPublishedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class PostController extends Controller
 {
@@ -59,6 +62,13 @@ class PostController extends Controller
             return $post->load(['meta', 'blocks', 'tool'])->loadCount('likes');
         });
 
+        if ($post->status === 'published') {
+            Notification::send(
+                User::query()->whereNotNull('email_verified_at')->get(),
+                new NewPostPublishedNotification($post),
+            );
+        }
+
         return PostResource::make($post)
             ->response()
             ->setStatusCode(201);
@@ -73,6 +83,8 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, Post $post): PostResource
     {
+        $wasPublished = $post->status === 'published';
+
         DB::transaction(function () use ($request, $post): void {
             $validated = $request->validated();
 
@@ -108,7 +120,16 @@ class PostController extends Controller
             }
         });
 
-        return PostResource::make($post->fresh()->load(['meta', 'blocks', 'tool'])->loadCount('likes'));
+        $post = $post->fresh()->load(['meta', 'blocks', 'tool'])->loadCount('likes');
+
+        if (! $wasPublished && $post->status === 'published') {
+            Notification::send(
+                User::query()->whereNotNull('email_verified_at')->get(),
+                new NewPostPublishedNotification($post),
+            );
+        }
+
+        return PostResource::make($post);
     }
 
     public function destroy(Post $post): JsonResponse

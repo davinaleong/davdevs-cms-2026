@@ -2,6 +2,9 @@
 
 use App\Enums\PostType;
 use App\Models\Post;
+use App\Models\User;
+use App\Notifications\NewPostPublishedNotification;
+use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -102,4 +105,26 @@ it('deletes a post', function () {
 
     $response->assertNoContent();
     expect($post->fresh()->deleted_at)->not->toBeNull();
+});
+
+it('notifies verified users when a post is published', function () {
+    Notification::fake();
+
+    $verifiedUser = User::factory()->create();
+    $unverifiedUser = User::factory()->unverified()->create();
+
+    $response = postJson('/api/posts', [
+        'title' => 'Published update',
+        'post_type' => PostType::Project->value,
+        'slug' => 'published-update',
+        'excerpt' => 'Summary',
+        'content_md' => '# Published',
+        'status' => 'published',
+        'published_at' => now()->toISOString(),
+    ]);
+
+    $response->assertCreated();
+
+    Notification::assertSentTo($verifiedUser, NewPostPublishedNotification::class);
+    Notification::assertNotSentTo($unverifiedUser, NewPostPublishedNotification::class);
 });
