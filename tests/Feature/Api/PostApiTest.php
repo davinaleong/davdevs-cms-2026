@@ -63,10 +63,19 @@ it('creates a post with meta and blocks', function () {
                 ],
             ],
         ],
+        'tool' => [
+            'component_name' => 'CalculatorTool',
+            'bundle_path' => '/tools/calculator.js',
+            'props' => [
+                'mode' => 'simple',
+            ],
+            'is_active' => true,
+        ],
     ]);
 
     $response->assertCreated();
     expect(Post::query()->count())->toBe(1);
+    expect($response->json('data.tool.component_name'))->toBe('CalculatorTool');
 });
 
 it('updates a post', function () {

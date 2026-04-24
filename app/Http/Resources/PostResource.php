@@ -36,6 +36,12 @@ class PostResource extends JsonResource
                 'position' => $block->position,
                 'payload' => $block->payload,
             ])->all()),
+            'tool' => $this->whenLoaded('tool', fn () => [
+                'component_name' => $this->tool?->component_name,
+                'bundle_path' => $this->tool?->bundle_path,
+                'props' => $this->tool?->props,
+                'is_active' => $this->tool?->is_active,
+            ]),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

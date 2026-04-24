@@ -1,1 +1,1 @@
-//
+import './tool-hydrator';

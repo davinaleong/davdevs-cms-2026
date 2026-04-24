@@ -3,6 +3,7 @@
 ## Progress Log
 
 - [x] Iteration 1 (2026-04-24): API scaffolding with Sanctum, UUID base model strategy, core CMS schema/models, post API CRUD, Blade post rendering, and passing Pest tests for API + web routes.
+- [x] Iteration 2 (2026-04-24): Implemented Projects block templates (hero/problem/solution/tech_stack/gallery), Tools domain + hydration container pipeline, Jokes system (table, logic, random API, web page), and added passing Pest coverage.
 
 **Goal: Set up a stable base you won’t regret later**
 
@@ -80,43 +81,43 @@
 
 ## 🧑‍💻 Projects
 
-* [ ] Define blocks:
+* [x] Define blocks:
 
-  * [ ] hero
-  * [ ] problem
-  * [ ] solution
-  * [ ] tech_stack
-  * [ ] gallery
-* [ ] Build Blade components for each block
+  * [x] hero
+  * [x] problem
+  * [x] solution
+  * [x] tech_stack
+  * [x] gallery
+* [x] Build Blade components for each block
 
 ---
 
 ## 🛠 Tools (React Integration)
 
-* [ ] Create `tools` table (component name, bundle path)
-* [ ] Blade container for hydration
-* [ ] Load React component dynamically
-* [ ] Ensure standalone rendering works
+* [x] Create `tools` table (component name, bundle path)
+* [x] Blade container for hydration
+* [x] Load React component dynamically
+* [x] Ensure standalone rendering works
 
 ---
 
 ## 😂 Jokes System
 
-* [ ] Create `jokes` table
-* [ ] Add fields:
+* [x] Create `jokes` table
+* [x] Add fields:
 
-  * [ ] type (statement / qa)
-  * [ ] question
-  * [ ] answer
+  * [x] type (statement / qa)
+  * [x] question
+  * [x] answer
 
 ### Logic
 
-* [ ] Statement → render immediately
-* [ ] Q/A → delayed reveal (JS)
+* [x] Statement → render immediately
+* [x] Q/A → delayed reveal (JS)
 
 ### API
 
-* [ ] `/api/jokes/random`
+* [x] `/api/jokes/random`
 
 ---
 

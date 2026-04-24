@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\JokesPageController;
 use App\Http\Controllers\PostPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,3 +9,4 @@ Route::get('/', function () {
 });
 
 Route::get('/posts/{post:slug}', [PostPageController::class, 'show'])->name('posts.show');
+Route::get('/jokes', JokesPageController::class)->name('jokes.index');

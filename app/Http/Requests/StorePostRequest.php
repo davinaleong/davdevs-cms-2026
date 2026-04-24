@@ -42,6 +42,11 @@ class StorePostRequest extends FormRequest
             'blocks.*.type' => ['required_with:blocks', 'string', 'max:80'],
             'blocks.*.position' => ['nullable', 'integer', 'min:1'],
             'blocks.*.payload' => ['required_with:blocks', 'array'],
+            'tool' => ['nullable', 'array'],
+            'tool.component_name' => ['required_with:tool', 'string', 'max:255'],
+            'tool.bundle_path' => ['required_with:tool', 'string', 'max:255'],
+            'tool.props' => ['nullable', 'array'],
+            'tool.is_active' => ['nullable', 'boolean'],
         ];
     }
 }

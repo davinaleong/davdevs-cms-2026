@@ -49,6 +49,11 @@ class Post extends BaseModel
         return $this->hasMany(PostBlock::class)->orderBy('position');
     }
 
+    public function tool(): HasOne
+    {
+        return $this->hasOne(Tool::class);
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published')->whereNotNull('published_at');

@@ -18,7 +18,7 @@ class PostController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $posts = Post::query()
-            ->with(['meta', 'blocks'])
+            ->with(['meta', 'blocks', 'tool'])
             ->published()
             ->when($request->filled('type'), fn ($query) => $query->where('post_type', $request->string('type')->toString()))
             ->latest('published_at')
@@ -32,7 +32,7 @@ class PostController extends Controller
         $post = DB::transaction(function () use ($request): Post {
             $validated = $request->validated();
 
-            $post = Post::query()->create(Arr::except($validated, ['meta', 'blocks']));
+            $post = Post::query()->create(Arr::except($validated, ['meta', 'blocks', 'tool']));
 
             if (! empty($validated['meta'])) {
                 $post->meta()->create($validated['meta']);
@@ -51,7 +51,11 @@ class PostController extends Controller
                 );
             }
 
-            return $post->load(['meta', 'blocks']);
+            if (! empty($validated['tool'])) {
+                $post->tool()->create($validated['tool']);
+            }
+
+            return $post->load(['meta', 'blocks', 'tool']);
         });
 
         return PostResource::make($post)
@@ -63,7 +67,7 @@ class PostController extends Controller
     {
         abort_if($post->status !== 'published', 404);
 
-        return PostResource::make($post->load(['meta', 'blocks']));
+        return PostResource::make($post->load(['meta', 'blocks', 'tool']));
     }
 
     public function update(UpdatePostRequest $request, Post $post): PostResource
@@ -71,7 +75,7 @@ class PostController extends Controller
         DB::transaction(function () use ($request, $post): void {
             $validated = $request->validated();
 
-            $post->update(Arr::except($validated, ['meta', 'blocks']));
+            $post->update(Arr::except($validated, ['meta', 'blocks', 'tool']));
 
             if (array_key_exists('meta', $validated)) {
                 $post->meta()->updateOrCreate([], $validated['meta'] ?? []);
@@ -93,9 +97,17 @@ class PostController extends Controller
                     );
                 }
             }
+
+            if (array_key_exists('tool', $validated)) {
+                if (! empty($validated['tool'])) {
+                    $post->tool()->updateOrCreate([], $validated['tool']);
+                } else {
+                    $post->tool()->delete();
+                }
+            }
         });
 
-        return PostResource::make($post->fresh()->load(['meta', 'blocks']));
+        return PostResource::make($post->fresh()->load(['meta', 'blocks', 'tool']));
     }
 
     public function destroy(Post $post): JsonResponse
