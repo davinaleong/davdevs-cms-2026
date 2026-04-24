@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
@@ -14,9 +15,11 @@ class RegisterController extends Controller
         $user = User::query()->create($request->validated());
         $user->sendEmailVerificationNotification();
 
+        Auth::login($user);
+        $request->session()->regenerate();
+
         return response()->json([
             'data' => [
-                'token' => $user->createToken('api-token')->plainTextToken,
                 'user' => $user,
                 'email_verification_sent' => true,
             ],

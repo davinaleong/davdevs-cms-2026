@@ -4,8 +4,8 @@ use App\Models\Admin;
 use App\Models\User;
 use App\Support\Security\TotpService;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
@@ -17,7 +17,7 @@ it('logs in an admin and returns force-password-change status', function () {
         'must_change_password' => true,
     ]);
 
-    $response = postJson('/api/admin/auth/login', [
+    $response = postJson('/admin/auth/login', [
         'email' => 'admin@example.com',
         'password' => 'password123',
     ]);
@@ -34,9 +34,9 @@ it('returns admin profile for authenticated admin', function () {
         'must_change_password' => true,
     ]);
 
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    $response = getJson('/api/admin/auth/me');
+    $response = getJson('/admin/auth/me');
 
     $response
         ->assertSuccessful()
@@ -46,23 +46,23 @@ it('returns admin profile for authenticated admin', function () {
 });
 
 it('rejects user token on admin me endpoint', function () {
-    Sanctum::actingAs(User::factory()->create());
+    actingAs(User::factory()->create(), 'web');
 
-    $response = getJson('/api/admin/auth/me');
+    $response = getJson('/admin/auth/me');
 
-    $response->assertForbidden();
+    $response->assertUnauthorized();
 });
 
 it('rejects user token on admin force password change endpoint', function () {
-    Sanctum::actingAs(User::factory()->create());
+    actingAs(User::factory()->create(), 'web');
 
-    $response = postJson('/api/admin/auth/force-password-change', [
+    $response = postJson('/admin/auth/force-password-change', [
         'current_password' => 'password123',
         'password' => 'newpassword123',
         'password_confirmation' => 'newpassword123',
     ]);
 
-    $response->assertForbidden();
+    $response->assertUnauthorized();
 });
 
 it('forces admin password change and clears flag', function () {
@@ -71,9 +71,9 @@ it('forces admin password change and clears flag', function () {
         'must_change_password' => true,
     ]);
 
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    $response = postJson('/api/admin/auth/force-password-change', [
+    $response = postJson('/admin/auth/force-password-change', [
         'current_password' => 'password123',
         'password' => 'newpassword123',
         'password_confirmation' => 'newpassword123',
@@ -85,7 +85,7 @@ it('forces admin password change and clears flag', function () {
 
     expect($admin->fresh()->must_change_password)->toBeFalse();
 
-    $loginResponse = postJson('/api/admin/auth/login', [
+    $loginResponse = postJson('/admin/auth/login', [
         'email' => $admin->email,
         'password' => 'newpassword123',
     ]);
@@ -95,9 +95,9 @@ it('forces admin password change and clears flag', function () {
 
 it('sets up two factor authentication for admins', function () {
     $admin = Admin::factory()->create();
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    $response = postJson('/api/admin/auth/2fa/setup');
+    $response = postJson('/admin/auth/2fa/setup');
 
     $response
         ->assertSuccessful()
@@ -121,14 +121,14 @@ it('sets up two factor authentication for admins', function () {
 
 it('verifies admin two factor authentication code', function () {
     $admin = Admin::factory()->create();
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    $setupResponse = postJson('/api/admin/auth/2fa/setup');
+    $setupResponse = postJson('/admin/auth/2fa/setup');
     $secret = $setupResponse->json('data.secret');
 
     $code = app(TotpService::class)->currentCode($secret);
 
-    $verifyResponse = postJson('/api/admin/auth/2fa/verify', [
+    $verifyResponse = postJson('/admin/auth/2fa/verify', [
         'code' => $code,
     ]);
 
@@ -141,12 +141,12 @@ it('verifies admin two factor authentication code', function () {
 
 it('verifies admin two factor with a recovery code and consumes it', function () {
     $admin = Admin::factory()->create();
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    $setupResponse = postJson('/api/admin/auth/2fa/setup');
+    $setupResponse = postJson('/admin/auth/2fa/setup');
     $recoveryCode = $setupResponse->json('data.recovery_codes.0');
 
-    $verifyResponse = postJson('/api/admin/auth/2fa/verify', [
+    $verifyResponse = postJson('/admin/auth/2fa/verify', [
         'recovery_code' => $recoveryCode,
     ]);
 
@@ -156,7 +156,7 @@ it('verifies admin two factor with a recovery code and consumes it', function ()
         ->assertJsonPath('data.used_recovery_code', true)
         ->assertJsonPath('data.recovery_codes_remaining', 7);
 
-    $reuseResponse = postJson('/api/admin/auth/2fa/verify', [
+    $reuseResponse = postJson('/admin/auth/2fa/verify', [
         'recovery_code' => $recoveryCode,
     ]);
 
@@ -165,11 +165,11 @@ it('verifies admin two factor with a recovery code and consumes it', function ()
 
 it('regenerates admin recovery codes', function () {
     $admin = Admin::factory()->create();
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    postJson('/api/admin/auth/2fa/setup')->assertSuccessful();
+    postJson('/admin/auth/2fa/setup')->assertSuccessful();
 
-    $response = postJson('/api/admin/auth/2fa/recovery-codes/regenerate');
+    $response = postJson('/admin/auth/2fa/recovery-codes/regenerate');
 
     $response
         ->assertSuccessful()
@@ -181,11 +181,11 @@ it('regenerates admin recovery codes', function () {
 
 it('downloads admin recovery codes as txt', function () {
     $admin = Admin::factory()->create();
-    Sanctum::actingAs($admin);
+    actingAs($admin, 'admin');
 
-    postJson('/api/admin/auth/2fa/setup')->assertSuccessful();
+    postJson('/admin/auth/2fa/setup')->assertSuccessful();
 
-    $response = post('/api/admin/auth/2fa/recovery-codes/download');
+    $response = post('/admin/auth/2fa/recovery-codes/download');
 
     $response
         ->assertSuccessful()

@@ -7,8 +7,8 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
-use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
@@ -16,7 +16,7 @@ use function Pest\Laravel\postJson;
 it('registers a user and returns a token', function () {
     Notification::fake();
 
-    $response = postJson('/api/auth/register', [
+    $response = postJson('/auth/register', [
         'name' => 'Jane Doe',
         'email' => 'jane@example.com',
         'password' => 'password123',
@@ -38,7 +38,7 @@ it('logs in a user with valid credentials', function () {
         'password' => 'password123',
     ]);
 
-    $response = postJson('/api/auth/login', [
+    $response = postJson('/auth/login', [
         'email' => 'john@example.com',
         'password' => 'password123',
     ]);
@@ -55,7 +55,7 @@ it('rejects invalid login credentials', function () {
         'password' => 'password123',
     ]);
 
-    $response = postJson('/api/auth/login', [
+    $response = postJson('/auth/login', [
         'email' => 'john@example.com',
         'password' => 'invalid-password',
     ]);
@@ -65,9 +65,9 @@ it('rejects invalid login credentials', function () {
 
 it('returns the authenticated user', function () {
     $user = User::factory()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    $response = getJson('/api/auth/me');
+    $response = getJson('/auth/me');
 
     $response
         ->assertSuccessful()
@@ -76,25 +76,23 @@ it('returns the authenticated user', function () {
         ->assertJsonPath('data.two_factor_enabled', false);
 });
 
-it('logs out and revokes the current token', function () {
+it('logs out the current web session', function () {
     $user = User::factory()->create();
-    $token = $user->createToken('api-token')->plainTextToken;
+    actingAs($user, 'web');
 
-    $response = postJson('/api/auth/logout', [], [
-        'Authorization' => 'Bearer '.$token,
-    ]);
+    $response = postJson('/auth/logout');
 
     $response->assertNoContent();
-    expect($user->fresh()->tokens()->count())->toBe(0);
+    $this->assertGuest('web');
 });
 
 it('sends a verification email for authenticated unverified users', function () {
     Notification::fake();
 
     $user = User::factory()->unverified()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    $response = postJson('/api/auth/email/verification-notification');
+    $response = postJson('/auth/email/verification-notification');
 
     $response->assertSuccessful()->assertJsonPath('data.email_verification_sent', true);
     Notification::assertSentTo($user, VerifyEmail::class);
@@ -102,7 +100,7 @@ it('sends a verification email for authenticated unverified users', function () 
 
 it('verifies email using signed url', function () {
     $user = User::factory()->unverified()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
     $signedUrl = URL::temporarySignedRoute('api.verification.verify', now()->addMinutes(60), [
         'id' => $user->id,
@@ -117,9 +115,9 @@ it('verifies email using signed url', function () {
 
 it('sets up two factor authentication for users', function () {
     $user = User::factory()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    $response = postJson('/api/auth/2fa/setup');
+    $response = postJson('/auth/2fa/setup');
 
     $response
         ->assertSuccessful()
@@ -143,14 +141,14 @@ it('sets up two factor authentication for users', function () {
 
 it('verifies user two factor authentication code', function () {
     $user = User::factory()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    $setupResponse = postJson('/api/auth/2fa/setup');
+    $setupResponse = postJson('/auth/2fa/setup');
     $secret = $setupResponse->json('data.secret');
 
     $code = app(TotpService::class)->currentCode($secret);
 
-    $verifyResponse = postJson('/api/auth/2fa/verify', [
+    $verifyResponse = postJson('/auth/2fa/verify', [
         'code' => $code,
     ]);
 
@@ -163,12 +161,12 @@ it('verifies user two factor authentication code', function () {
 
 it('verifies user two factor with a recovery code and consumes it', function () {
     $user = User::factory()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    $setupResponse = postJson('/api/auth/2fa/setup');
+    $setupResponse = postJson('/auth/2fa/setup');
     $recoveryCode = $setupResponse->json('data.recovery_codes.0');
 
-    $verifyResponse = postJson('/api/auth/2fa/verify', [
+    $verifyResponse = postJson('/auth/2fa/verify', [
         'recovery_code' => $recoveryCode,
     ]);
 
@@ -178,7 +176,7 @@ it('verifies user two factor with a recovery code and consumes it', function () 
         ->assertJsonPath('data.used_recovery_code', true)
         ->assertJsonPath('data.recovery_codes_remaining', 7);
 
-    $reuseResponse = postJson('/api/auth/2fa/verify', [
+    $reuseResponse = postJson('/auth/2fa/verify', [
         'recovery_code' => $recoveryCode,
     ]);
 
@@ -187,11 +185,11 @@ it('verifies user two factor with a recovery code and consumes it', function () 
 
 it('regenerates user recovery codes', function () {
     $user = User::factory()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    postJson('/api/auth/2fa/setup')->assertSuccessful();
+    postJson('/auth/2fa/setup')->assertSuccessful();
 
-    $response = postJson('/api/auth/2fa/recovery-codes/regenerate');
+    $response = postJson('/auth/2fa/recovery-codes/regenerate');
 
     $response
         ->assertSuccessful()
@@ -203,11 +201,11 @@ it('regenerates user recovery codes', function () {
 
 it('downloads user recovery codes as txt', function () {
     $user = User::factory()->create();
-    Sanctum::actingAs($user);
+    actingAs($user, 'web');
 
-    postJson('/api/auth/2fa/setup')->assertSuccessful();
+    postJson('/auth/2fa/setup')->assertSuccessful();
 
-    $response = post('/api/auth/2fa/recovery-codes/download');
+    $response = post('/auth/2fa/recovery-codes/download');
 
     $response
         ->assertSuccessful()
@@ -216,10 +214,10 @@ it('downloads user recovery codes as txt', function () {
 });
 
 it('rejects admin token on user two factor endpoints', function () {
-    Sanctum::actingAs(Admin::factory()->create());
+    actingAs(Admin::factory()->create(), 'admin');
 
-    $setupResponse = postJson('/api/auth/2fa/setup');
-    $verifyResponse = postJson('/api/auth/2fa/verify', [
+    $setupResponse = postJson('/auth/2fa/setup');
+    $verifyResponse = postJson('/auth/2fa/verify', [
         'code' => '123456',
     ]);
 
