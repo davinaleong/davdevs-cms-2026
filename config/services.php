@@ -16,6 +16,7 @@ return [
 
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
+        'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
     ],
 
     'resend' => [
@@ -26,6 +27,12 @@ return [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
     'slack' => [
