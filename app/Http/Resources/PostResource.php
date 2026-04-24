@@ -23,6 +23,7 @@ class PostResource extends JsonResource
             'content_md' => $this->content_md,
             'status' => $this->status,
             'published_at' => $this->published_at?->toISOString(),
+            'likes_count' => $this->likes_count ?? 0,
             'meta' => $this->whenLoaded('meta', fn () => [
                 'meta_title' => $this->meta?->meta_title,
                 'meta_description' => $this->meta?->meta_description,

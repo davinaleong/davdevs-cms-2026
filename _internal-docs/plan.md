@@ -4,6 +4,7 @@
 
 - [x] Iteration 1 (2026-04-24): API scaffolding with Sanctum, UUID base model strategy, core CMS schema/models, post API CRUD, Blade post rendering, and passing Pest tests for API + web routes.
 - [x] Iteration 2 (2026-04-24): Implemented Projects block templates (hero/problem/solution/tech_stack/gallery), Tools domain + hydration container pipeline, Jokes system (table, logic, random API, web page), and added passing Pest coverage.
+- [x] Iteration 3 (2026-04-24): Implemented Likes engagement system (likes table, authenticated toggle endpoint, post like count in API, JS UI button + guest state) with passing Pest coverage.
 
 **Goal: Set up a stable base you won’t regret later**
 
@@ -125,10 +126,10 @@
 
 ### ✅ Likes
 
-* [ ] Create `likes` table
-* [ ] Like/unlike toggle endpoint
-* [ ] Store count on post (optional cache)
-* [ ] UI button (Livewire or JS)
+* [x] Create `likes` table
+* [x] Like/unlike toggle endpoint
+* [x] Store count on post (optional cache)
+* [x] UI button (Livewire or JS)
 
 ---
 

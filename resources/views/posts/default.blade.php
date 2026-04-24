@@ -5,6 +5,22 @@
         @if ($post->excerpt)
             <p class="text-lg text-gray-600">{{ $post->excerpt }}</p>
         @endif
+
+        <div class="pt-2">
+            @auth
+                <button
+                    type="button"
+                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold"
+                    data-like-toggle
+                    data-post-slug="{{ $post->slug }}"
+                >
+                    Like
+                </button>
+                <span class="ml-2 text-sm text-gray-600" data-like-count>{{ $post->likes_count ?? 0 }}</span>
+            @else
+                <p class="text-sm text-gray-500">Sign in to like this post.</p>
+            @endauth
+        </div>
     </header>
 
     <div class="prose max-w-none">{!! nl2br(e($post->content_md)) !!}</div>

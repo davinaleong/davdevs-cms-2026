@@ -19,6 +19,7 @@ class PostController extends Controller
     {
         $posts = Post::query()
             ->with(['meta', 'blocks', 'tool'])
+            ->withCount('likes')
             ->published()
             ->when($request->filled('type'), fn ($query) => $query->where('post_type', $request->string('type')->toString()))
             ->latest('published_at')
@@ -55,7 +56,7 @@ class PostController extends Controller
                 $post->tool()->create($validated['tool']);
             }
 
-            return $post->load(['meta', 'blocks', 'tool']);
+            return $post->load(['meta', 'blocks', 'tool'])->loadCount('likes');
         });
 
         return PostResource::make($post)
@@ -67,7 +68,7 @@ class PostController extends Controller
     {
         abort_if($post->status !== 'published', 404);
 
-        return PostResource::make($post->load(['meta', 'blocks', 'tool']));
+        return PostResource::make($post->load(['meta', 'blocks', 'tool'])->loadCount('likes'));
     }
 
     public function update(UpdatePostRequest $request, Post $post): PostResource
@@ -107,7 +108,7 @@ class PostController extends Controller
             }
         });
 
-        return PostResource::make($post->fresh()->load(['meta', 'blocks', 'tool']));
+        return PostResource::make($post->fresh()->load(['meta', 'blocks', 'tool'])->loadCount('likes'));
     }
 
     public function destroy(Post $post): JsonResponse

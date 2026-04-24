@@ -54,6 +54,11 @@ class Post extends BaseModel
         return $this->hasOne(Tool::class);
     }
 
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published')->whereNotNull('published_at');

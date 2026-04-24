@@ -11,7 +11,7 @@ class PostPageController extends Controller
     {
         abort_if($post->status !== 'published', 404);
 
-        $post->load(['meta', 'blocks', 'tool']);
+        $post->load(['meta', 'blocks', 'tool'])->loadCount('likes');
 
         return view('posts.show', [
             'post' => $post,
