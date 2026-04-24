@@ -1,632 +1,311 @@
-# 🚀 MASTER BUILD PLAN (SPLIT: BACKEND vs FRONTEND)
+# 🚀 PHASE 0 — Foundation (Don’t skip this)
+
+**Goal: Set up a stable base you won’t regret later**
+
+### ✅ Project Setup
+
+* [ ] Initialize Laravel project
+* [ ] Configure UUIDs globally (models + migrations)
+* [ ] Set up environment (DB, mail, queue)
+* [ ] Install auth starter (Laravel Breeze or Fortify)
+
+### ✅ Core Architecture Decisions
+
+* [ ] Decide: REST or GraphQL (you can start REST)
+* [ ] Define post types enum (`project`, `tool`, `joke`, etc.)
+* [ ] Decide JSON structure for `post_blocks`
 
 ---
 
-# ⚙️ BACKEND — Laravel (Headless CMS + Engine)
+# 🧱 PHASE 1 — Core CMS Engine
+
+**Goal: You can create and render content**
+
+### ✅ Database
+
+* [ ] Create `posts` table
+* [ ] Create `post_meta` table (SEO)
+* [ ] Create `post_blocks` table (structured content)
+* [ ] Add indexes (slug, type, status)
+
+### ✅ Models
+
+* [ ] Post model (UUID, relationships)
+* [ ] PostMeta model
+* [ ] PostBlock model
+
+### ✅ Admin CRUD (Basic)
+
+* [ ] Create post (title, type, slug)
+* [ ] Edit post
+* [ ] Delete post
+* [ ] Publish/unpublish toggle
 
 ---
 
-# 🟩 PHASE B1 — Foundation
+# 🎨 PHASE 2 — Blade Rendering System
 
-**Goal:** Solid API base
+**Goal: Your portfolio is fully powered by CMS**
 
-### Setup
+### ✅ Routing
 
-* [ ] Install Laravel (latest)
-* [ ] Configure DB + `.env`
-* [ ] Enable UUIDs (BaseModel)
+* [ ] `/posts/{slug}` route
+* [ ] Controller to fetch post + blocks + meta
 
-### Architecture
+### ✅ Dynamic Rendering
 
-* [ ] Folder structure:
+* [ ] Create `posts/{type}.blade.php`
+* [ ] Implement block renderer:
 
-  * `Services/`
-  * `Actions/`
-  * `DTOs/` (optional but nice)
-* [ ] API routes (`routes/api.php`)
-* [ ] API response format (standardised JSON)
+  * [ ] `@include("blocks.{type}")`
+* [ ] Build base layout (SEO-ready)
 
----
+### ✅ SEO Metadata
 
-# 🟦 PHASE B2 — Content Core
-
-**Goal:** Replace MD files with DB content
+* [ ] Meta title + description
+* [ ] Open Graph tags
+* [ ] Canonical URL support
 
 ---
 
-## Database
+# 🧩 PHASE 3 — Post Type Systems
 
-* [ ] `post_types`
-
-  * id (UUID)
-  * name
-  * slug
-  * default_is_premium (bool)
-
-* [ ] `posts`
-
-  * id (UUID)
-  * post_type_id
-  * title
-  * slug
-  * excerpt
-  * content_md
-  * status
-  * published_at
+**Goal: Match your portfolio structure**
 
 ---
 
-## Models
+## 🧑‍💻 Projects
 
-* [ ] Post → belongsTo PostType
-* [ ] Accessor:
+* [ ] Define blocks:
 
-  * `$post->is_premium`
-
----
-
-## API
-
-* [ ] `GET /posts`
-* [ ] `GET /posts/{slug}`
-* [ ] `GET /post-types`
+  * [ ] hero
+  * [ ] problem
+  * [ ] solution
+  * [ ] tech_stack
+  * [ ] gallery
+* [ ] Build Blade components for each block
 
 ---
 
-## Seeder
+## 🛠 Tools (React Integration)
 
-* [ ] Seed post types:
-
-  * blog (free)
-  * devlog (premium)
-  * deep-dive (premium)
-  * testimony (free)
+* [ ] Create `tools` table (component name, bundle path)
+* [ ] Blade container for hydration
+* [ ] Load React component dynamically
+* [ ] Ensure standalone rendering works
 
 ---
 
-# 🟨 PHASE B3 — Engagement System
+## 😂 Jokes System
 
----
+* [ ] Create `jokes` table
+* [ ] Add fields:
 
-## 🧩 Voting
-
-### DB
-
-* [ ] `votes`
-
-  * id
-  * post_id
-  * fingerprint_hash
-  * vote_type
-
----
-
-### API
-
-* [ ] `POST /votes`
-
----
+  * [ ] type (statement / qa)
+  * [ ] question
+  * [ ] answer
 
 ### Logic
 
-* [ ] Hash(IP + UA)
-* [ ] 1 vote / post / 24h
-* [ ] Prevent duplicates
-
----
-
-## 🧩 Reading Tracking
-
-### DB
-
-* [ ] `user_engagements`
-
-  * id
-  * user_id
-  * metric_type (read, premium_read, upvote)
-  * reference_id (post_id)
-
----
+* [ ] Statement → render immediately
+* [ ] Q/A → delayed reveal (JS)
 
 ### API
 
-* [ ] `POST /engagement/read`
+* [ ] `/api/jokes/random`
 
 ---
 
-### Logic
+# ❤️ PHASE 4 — Engagement Features
 
-* [ ] Deduplicate reads
-* [ ] Only count authenticated users
+### ✅ Likes
 
----
-
-## 🧩 Comment Eligibility Engine
-
-### Service
-
-* [ ] `CommentEligibilityService`
+* [ ] Create `likes` table
+* [ ] Like/unlike toggle endpoint
+* [ ] Store count on post (optional cache)
+* [ ] UI button (Livewire or JS)
 
 ---
 
-### Rules
+# 👤 PHASE 5 — User System
 
-* [ ] upvotes ≥ 5
-* [ ] OR premium_reads ≥ 3
-* [ ] OR active subscription
-
----
-
-### Optimization
-
-* [ ] Cache eligibility result
-* [ ] Recompute on events
-
----
-
-# 🟥 PHASE B4 — Comments System
-
----
-
-## DB
-
-* [ ] `comments`
-
-  * id
-  * user_id
-  * post_id
-  * content
-  * status (visible, hidden, flagged)
-
----
-
-## API
-
-* [ ] `GET /posts/{id}/comments`
-* [ ] `POST /comments`
-
----
-
-## Logic
-
-* [ ] Only eligible users can comment
-* [ ] Soft delete
-* [ ] Basic moderation flags
-
----
-
-# 🟪 PHASE B5 — Monetisation (Stripe)
-
----
-
-## Stripe Setup
-
-* [ ] Create products
-* [ ] Create prices
-* [ ] Store Stripe IDs
-
----
-
-## DB
-
-* [ ] `subscriptions`
-
-  * user_id
-  * stripe_id
-  * status
-  * current_period_end
-
----
-
-## Webhooks
-
-* [ ] checkout.session.completed
-* [ ] customer.subscription.updated
-* [ ] invoice.payment_failed
-
----
-
-## API
-
-* [ ] `GET /me/subscription`
-* [ ] `POST /checkout/session`
-
----
-
-## Logic
-
-* [ ] `hasActiveSubscription()`
-* [ ] Sync Stripe → DB
-
----
-
-# 🟫 PHASE B6 — Auth (Sanctum)
-
----
-
-## Setup
-
-* [ ] Laravel Sanctum
-* [ ] Cookie-based auth
-
----
-
-## Features
+### ✅ Authentication
 
 * [ ] Register
 * [ ] Login
-* [ ] Logout
-* [ ] `/me` endpoint
+* [ ] Email verification
 
----
-
----
-
-# 🟩 PHASE B7 — Admin Panel (Laravel Only)
-
----
-
-## Features
-
-* [ ] Create/edit posts (Markdown editor)
-* [ ] Assign post type
-* [ ] Publish/unpublish
-
----
-
-## Optional
-
-* [ ] Engagement stats
-* [ ] Comment moderation
-
----
-
-# 🟦 PHASE B8 — Security & Performance
-
----
-
-## Security
-
-* [ ] Rate limiting (votes, engagement)
-* [ ] Validate all inputs
-* [ ] Sanitize Markdown
-
----
-
-## Performance
-
-* [ ] Cache posts
-* [ ] Cache eligibility
-* [ ] Queue webhooks
-
----
-
----
-
-# 🎨 FRONTEND — Next.js (Your Existing Site)
-
----
-
-# 🟩 PHASE F1 — API Integration
-
----
-
-## Replace MD Loader
-
-* [ ] Remove local MD file fetching
-* [ ] Fetch from Laravel API
-
----
-
-## Data Fetching
-
-* [ ] `getStaticProps` / `generateStaticParams`
-* [ ] ISR setup (revalidation)
-
----
-
-## Pages
-
-* [ ] `/posts`
-* [ ] `/posts/[slug]`
-
----
-
----
-
-# 🟦 PHASE F2 — Content Rendering
-
----
-
-## Markdown
-
-* [ ] Render MD → HTML (remark/rehype)
-
----
-
-## SEO
-
-* [ ] Meta tags from API
-* [ ] OG tags preserved
-
----
-
----
-
-# 🟨 PHASE F3 — Paywall UI
-
----
-
-## Logic
-
-* [ ] Fetch `/me/subscription`
-
----
-
-## Behaviour
-
-* [ ] If premium + not subscribed:
-
-  * show preview only
-
----
-
-## UI
+### ✅ Notifications
 
-* [ ] “Unlock full post”
-* [ ] Clean paywall section
+* [ ] Notify users on new posts
+* [ ] Queue email sending
 
 ---
 
----
-
-# 🟧 PHASE F4 — Voting UI
-
----
-
-## Features
-
-* [ ] Upvote button
-* [ ] Downvote button
-* [ ] Optimistic UI update
-
----
-
-## API
-
-* [ ] Call `/votes`
-
----
-
-## UX
-
-* [ ] Disable after vote
-* [ ] Show count
-
----
-
----
-
-# 🟥 PHASE F5 — Reading Detection
-
----
-
-## Logic
-
-* [ ] Track:
-
-  * time ≥ 15s
-  * scroll ≥ 50–80%
-
----
-
-## Trigger
-
-* [ ] Call `/engagement/read`
-
----
-
-## Safeguards
-
-* [ ] Send once per post
-* [ ] Silent background call
-
----
-
----
+# 🔐 PHASE 6 — Security (Critical)
 
-# 🟪 PHASE F6 — Comments UI
-
----
-
-## Display
-
-* [ ] Fetch comments
-* [ ] Show list
-
----
-
-## Input
-
-* [ ] Comment form
-
 ---
 
-## Eligibility
+## 👥 Admin Auth (Separate Guard)
 
-* [ ] Fetch eligibility status
-* [ ] Show:
-
-  * unlocked → form
-  * locked → progress UI
-
----
-
-## UX
-
-* [ ] “Unlock by engaging 💛”
-* [ ] Progress indicators
-
----
-
----
+* [ ] Create `admins` table
+* [ ] Configure guard
+* [ ] Seeder:
 
-# 🟫 PHASE F7 — Auth Integration
+  * [ ] Default admin account
+  * [ ] Force password change
 
 ---
 
-## Features
+## 🔒 2FA (User + Admin)
 
-* [ ] Login/register UI
-* [ ] Persist session (cookies)
+* [ ] Enable 2FA setup flow
+* [ ] QR code generation
+* [ ] Verify OTP flow
 
----
-
-## API
+### Recovery Codes
 
-* [ ] `/login`
-* [ ] `/me`
+* [ ] Generate backup codes
+* [ ] Store hashed
+* [ ] “Copy all” button
+* [ ] Download as `.txt`
 
 ---
 
----
+# 🔍 PHASE 7 — SEO & Crawlers
 
-# 🟦 PHASE F8 — Stripe Checkout Flow
+* [ ] Auto sitemap generator
+* [ ] robots.txt config
+* [ ] Structured data (JSON-LD)
+* [ ] Slug uniqueness validation
 
 ---
-
-## UI
 
-* [ ] Pricing page
-* [ ] Subscribe button
+# 🔌 PHASE 8 — Headless Mode
 
----
+### API
 
-## Flow
+* [ ] `/api/posts`
+* [ ] `/api/posts/{slug}`
+* [ ] `/api/posts?type=project`
 
-* [ ] Call `/checkout/session`
-* [ ] Redirect to Stripe
-* [ ] Return success page
+### Optional (Later)
 
----
+* [ ] GraphQL schema
+* [ ] Post + blocks query
 
 ---
 
-# 🟩 PHASE F9 — Polish & UX
+# 💰 PHASE 9 — Monetisation Layer
 
 ---
 
-## States
+## 🪙 Subscription System
 
-* [ ] Loading states
-* [ ] Empty states
-* [ ] Error states
+* [ ] Create `subscriptions` table
+* [ ] Plan enum (free, pro)
+* [ ] Expiry handling
 
 ---
 
-## Messaging
+## 💡 Feature Gating
 
-* [ ] Friendly paywall copy
-* [ ] Engagement encouragement
+* [ ] Middleware for premium features
+* [ ] Attach to routes (tools, refresh, etc.)
 
 ---
 
----
+## 🎲 Jokes Monetisation
 
-# 🔄 MIGRATION PLAN (CRITICAL)
+* [ ] Limit refresh for free users
+* [ ] Unlimited refresh for premium
 
 ---
 
-## Step 1 — Extract MD Files
+## 🛠 Tool Monetisation
 
-* [ ] Parse `.md`
-* [ ] Extract:
+* [ ] Mark tools as:
 
-  * title
-  * slug
-  * content
-  * metadata
+  * [ ] free
+  * [ ] premium
+* [ ] Restrict access
 
 ---
 
-## Step 2 — Insert into DB
+## 📩 Email Monetisation
 
-* [ ] Map to posts table
-* [ ] Assign post types
+* [ ] Weekly digest system
+* [ ] Premium-only content emails
 
 ---
 
-## Step 3 — Switch Frontend
+## 💼 Lead Generation
 
-* [ ] Replace MD loader → API
-* [ ] Test SEO
-
----
+* [ ] “Hire me” CTA module
+* [ ] Contact form (public + admin panel)
 
 ---
 
-# 🎯 BUILD ORDER (FASTEST PATH TO VALUE)
+# ⚡ PHASE 10 — UX Enhancements
 
-If you want momentum:
+* [ ] Smooth loading states
+* [ ] Skeleton loaders
+* [ ] Toast notifications
+* [ ] Copy-to-clipboard UX (2FA, codes)
 
 ---
 
-## Week 1
+# 🧠 PHASE 11 — Admin Panel (Upgrade)
 
-* Backend: Content API + post types
-* Frontend: Fetch + render posts
+* [ ] Block-based editor UI
+* [ ] Drag-and-drop block ordering
+* [ ] Preview before publish
+* [ ] Draft autosave
 
 ---
 
-## Week 2
+# 🧪 PHASE 12 — Testing
 
-* Paywall + Stripe
-* Premium content gating
+* [ ] Feature tests for:
 
----
-
-## Week 3
+  * [ ] Post CRUD
+  * [ ] Auth
+  * [ ] Likes
+* [ ] Unit tests for models
+* [ ] API tests
 
-* Voting + reading detection
-* Engagement system
-
 ---
 
-## Week 4
+# 🚀 PHASE 13 — Deployment
 
-* Comments + eligibility
-* Polish + launch
-
----
+* [ ] Production env config
+* [ ] Queue worker setup
+* [ ] Email service (Postmark, etc.)
+* [ ] Domain + SSL
+* [ ] Backup strategy
 
 ---
-
-# ❤️ FINAL SYSTEM
-
-You’re building:
-
-### 🧠 Headless CMS
-
-* Clean, structured, scalable
-
-### 💰 Monetised Content Platform
 
-* Subscription-based
-* Premium gating
+# 🧭 Suggested Build Order (Realistic)
 
-### 💛 Healthy Community System
+If you want to *actually finish*:
 
-* Earned engagement
-* No toxic free-for-all comments
+1. Phase 0–2 (Core CMS + rendering)
+2. Projects + Jokes
+3. Admin panel basic
+4. Auth + Likes
+5. Tools (React)
+6. 2FA
+7. Monetisation
 
 ---
 
-# ⚖️ Final Thought
+# ⚠️ Final Reality Check
 
-This is no longer:
+If you try to:
 
-> “a blog upgrade”
+> build everything at once → you’ll burn out
 
-This is:
+If you:
 
-> **your personal creator platform with full control**
+> ship Phase 1–3 first → you’ll already have a working CMS powering your portfolio
