@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\Auth\AdminForcePasswordChangeController;
+use App\Http\Controllers\Api\Admin\Auth\AdminLoginController;
+use App\Http\Controllers\Api\Admin\Auth\AdminMeController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\MeController;
@@ -22,6 +25,12 @@ Route::prefix('auth')->group(function (): void {
     Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['auth:sanctum', 'signed', 'throttle:6,1'])
         ->name('api.verification.verify');
+});
+
+Route::prefix('admin/auth')->group(function (): void {
+    Route::post('/login', AdminLoginController::class);
+    Route::get('/me', AdminMeController::class)->middleware('auth:sanctum');
+    Route::post('/force-password-change', AdminForcePasswordChangeController::class)->middleware('auth:sanctum');
 });
 
 Route::get('/post-types', PostTypeController::class);
