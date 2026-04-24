@@ -5,15 +5,17 @@ namespace App\Http\Controllers\Api\Admin\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Support\Security\TotpService;
+use App\Support\Security\TwoFactorRecoveryCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class AdminTwoFactorSetupController extends Controller
 {
-    public function __invoke(Request $request, TotpService $totpService): JsonResponse
-    {
+    public function __invoke(
+        Request $request,
+        TotpService $totpService,
+        TwoFactorRecoveryCodeService $recoveryCodeService,
+    ): JsonResponse {
         if (! $request->user() instanceof Admin) {
             return response()->json([
                 'message' => 'Forbidden.',
@@ -21,15 +23,11 @@ class AdminTwoFactorSetupController extends Controller
         }
 
         $secret = $totpService->generateSecret();
-        $recoveryCodes = collect(range(1, 8))
-            ->map(fn (): string => Str::upper(Str::random(4).'-'.Str::random(4)))
-            ->values();
+        $recoveryCodes = $recoveryCodeService->generatePlainCodes();
 
         $request->user()->forceFill([
             'two_factor_secret' => $secret,
-            'two_factor_recovery_codes' => $recoveryCodes
-                ->map(fn (string $recoveryCode): string => Hash::make($recoveryCode))
-                ->all(),
+            'two_factor_recovery_codes' => $recoveryCodeService->hashCodes($recoveryCodes),
             'two_factor_confirmed_at' => null,
         ])->save();
 
@@ -41,7 +39,8 @@ class AdminTwoFactorSetupController extends Controller
                     issuer: config('app.name'),
                     secret: $secret,
                 ),
-                'recovery_codes' => $recoveryCodes->all(),
+                'recovery_codes' => $recoveryCodes,
+                'recovery_codes_text' => $recoveryCodeService->asText($recoveryCodes),
                 'two_factor_enabled' => false,
             ],
         ]);

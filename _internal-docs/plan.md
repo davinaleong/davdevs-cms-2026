@@ -9,6 +9,7 @@
 - [x] Iteration 5 (2026-04-24): Implemented Phase 6 admin auth foundation with separate admin provider/guard, admins table, default admin seeder, and force-password-change API with passing Pest coverage.
 - [x] Iteration 6 (2026-04-24): Hardened API authorization with reusable `admin` middleware and protected admin endpoints plus post write routes, with updated passing Pest coverage.
 - [x] Iteration 7 (2026-04-24): Implemented user/admin 2FA setup + OTP verification APIs with otpauth QR URI payloads, encrypted secret storage, hashed recovery code storage, and expanded passing Pest coverage.
+- [x] Iteration 8 (2026-04-24): Implemented 2FA recovery-code verification fallback, regeneration endpoints with copy-ready text payloads, and `.txt` download endpoints for users/admins with expanded passing Pest coverage.
 
 **Goal: Set up a stable base you won’t regret later**
 
@@ -177,8 +178,8 @@
 
 * [x] Generate backup codes
 * [x] Store hashed
-* [ ] “Copy all” button
-* [ ] Download as `.txt`
+* [x] “Copy all” button
+* [x] Download as `.txt`
 
 ---
 

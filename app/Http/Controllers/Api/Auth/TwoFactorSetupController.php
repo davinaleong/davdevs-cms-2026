@@ -4,15 +4,18 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\Security\TwoFactorRecoveryCodeService;
 use App\Support\Security\TotpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class TwoFactorSetupController extends Controller
 {
-    public function __invoke(Request $request, TotpService $totpService): JsonResponse
+    public function __invoke(
+        Request $request,
+        TotpService $totpService,
+        TwoFactorRecoveryCodeService $recoveryCodeService,
+    ): JsonResponse
     {
         if (! $request->user() instanceof User) {
             return response()->json([
@@ -21,15 +24,11 @@ class TwoFactorSetupController extends Controller
         }
 
         $secret = $totpService->generateSecret();
-        $recoveryCodes = collect(range(1, 8))
-            ->map(fn (): string => Str::upper(Str::random(4).'-'.Str::random(4)))
-            ->values();
+        $recoveryCodes = $recoveryCodeService->generatePlainCodes();
 
         $request->user()->forceFill([
             'two_factor_secret' => $secret,
-            'two_factor_recovery_codes' => $recoveryCodes
-                ->map(fn (string $recoveryCode): string => Hash::make($recoveryCode))
-                ->all(),
+            'two_factor_recovery_codes' => $recoveryCodeService->hashCodes($recoveryCodes),
             'two_factor_confirmed_at' => null,
         ])->save();
 
@@ -41,7 +40,8 @@ class TwoFactorSetupController extends Controller
                     issuer: config('app.name'),
                     secret: $secret,
                 ),
-                'recovery_codes' => $recoveryCodes->all(),
+                'recovery_codes' => $recoveryCodes,
+                'recovery_codes_text' => $recoveryCodeService->asText($recoveryCodes),
                 'two_factor_enabled' => false,
             ],
         ]);

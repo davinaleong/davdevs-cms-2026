@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
 
 it('registers a user and returns a token', function () {
@@ -130,6 +131,7 @@ it('sets up two factor authentication for users', function () {
 
     expect($secret)->not->toBeEmpty();
     expect($response->json('data.otpauth_url'))->toContain('otpauth://totp/');
+    expect($response->json('data.recovery_codes_text'))->toContain(PHP_EOL);
 
     $refreshedUser = $user->fresh();
 
@@ -157,6 +159,60 @@ it('verifies user two factor authentication code', function () {
         ->assertJsonPath('data.two_factor_enabled', true);
 
     expect($user->fresh()->two_factor_confirmed_at)->not->toBeNull();
+});
+
+it('verifies user two factor with a recovery code and consumes it', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $setupResponse = postJson('/api/auth/2fa/setup');
+    $recoveryCode = $setupResponse->json('data.recovery_codes.0');
+
+    $verifyResponse = postJson('/api/auth/2fa/verify', [
+        'recovery_code' => $recoveryCode,
+    ]);
+
+    $verifyResponse
+        ->assertSuccessful()
+        ->assertJsonPath('data.two_factor_enabled', true)
+        ->assertJsonPath('data.used_recovery_code', true)
+        ->assertJsonPath('data.recovery_codes_remaining', 7);
+
+    $reuseResponse = postJson('/api/auth/2fa/verify', [
+        'recovery_code' => $recoveryCode,
+    ]);
+
+    $reuseResponse->assertUnprocessable();
+});
+
+it('regenerates user recovery codes', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    postJson('/api/auth/2fa/setup')->assertSuccessful();
+
+    $response = postJson('/api/auth/2fa/recovery-codes/regenerate');
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonCount(8, 'data.recovery_codes');
+
+    expect($response->json('data.recovery_codes_text'))->toContain(PHP_EOL);
+    expect($user->fresh()->two_factor_recovery_codes)->toHaveCount(8);
+});
+
+it('downloads user recovery codes as txt', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    postJson('/api/auth/2fa/setup')->assertSuccessful();
+
+    $response = post('/api/auth/2fa/recovery-codes/download');
+
+    $response
+        ->assertSuccessful()
+        ->assertHeader('content-type', 'text/plain; charset=UTF-8')
+        ->assertHeader('content-disposition', 'attachment; filename=user-recovery-codes.txt');
 });
 
 it('rejects admin token on user two factor endpoints', function () {

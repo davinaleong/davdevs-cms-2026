@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
 
 it('logs in an admin and returns force-password-change status', function () {
@@ -108,6 +109,7 @@ it('sets up two factor authentication for admins', function () {
 
     expect($secret)->not->toBeEmpty();
     expect($response->json('data.otpauth_url'))->toContain('otpauth://totp/');
+    expect($response->json('data.recovery_codes_text'))->toContain(PHP_EOL);
 
     $refreshedAdmin = $admin->fresh();
 
@@ -135,4 +137,58 @@ it('verifies admin two factor authentication code', function () {
         ->assertJsonPath('data.two_factor_enabled', true);
 
     expect($admin->fresh()->two_factor_confirmed_at)->not->toBeNull();
+});
+
+it('verifies admin two factor with a recovery code and consumes it', function () {
+    $admin = Admin::factory()->create();
+    Sanctum::actingAs($admin);
+
+    $setupResponse = postJson('/api/admin/auth/2fa/setup');
+    $recoveryCode = $setupResponse->json('data.recovery_codes.0');
+
+    $verifyResponse = postJson('/api/admin/auth/2fa/verify', [
+        'recovery_code' => $recoveryCode,
+    ]);
+
+    $verifyResponse
+        ->assertSuccessful()
+        ->assertJsonPath('data.two_factor_enabled', true)
+        ->assertJsonPath('data.used_recovery_code', true)
+        ->assertJsonPath('data.recovery_codes_remaining', 7);
+
+    $reuseResponse = postJson('/api/admin/auth/2fa/verify', [
+        'recovery_code' => $recoveryCode,
+    ]);
+
+    $reuseResponse->assertUnprocessable();
+});
+
+it('regenerates admin recovery codes', function () {
+    $admin = Admin::factory()->create();
+    Sanctum::actingAs($admin);
+
+    postJson('/api/admin/auth/2fa/setup')->assertSuccessful();
+
+    $response = postJson('/api/admin/auth/2fa/recovery-codes/regenerate');
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonCount(8, 'data.recovery_codes');
+
+    expect($response->json('data.recovery_codes_text'))->toContain(PHP_EOL);
+    expect($admin->fresh()->two_factor_recovery_codes)->toHaveCount(8);
+});
+
+it('downloads admin recovery codes as txt', function () {
+    $admin = Admin::factory()->create();
+    Sanctum::actingAs($admin);
+
+    postJson('/api/admin/auth/2fa/setup')->assertSuccessful();
+
+    $response = post('/api/admin/auth/2fa/recovery-codes/download');
+
+    $response
+        ->assertSuccessful()
+        ->assertHeader('content-type', 'text/plain; charset=UTF-8')
+        ->assertHeader('content-disposition', 'attachment; filename=admin-recovery-codes.txt');
 });

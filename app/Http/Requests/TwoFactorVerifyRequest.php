@@ -14,7 +14,8 @@ class TwoFactorVerifyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['required', 'digits:6'],
+            'code' => ['nullable', 'digits:6', 'required_without:recovery_code'],
+            'recovery_code' => ['nullable', 'string', 'required_without:code'],
         ];
     }
 }
