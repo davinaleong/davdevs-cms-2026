@@ -14,6 +14,7 @@ class MeController extends Controller
             'data' => [
                 'user' => $request->user(),
                 'email_verified' => $request->user()->hasVerifiedEmail(),
+                'two_factor_enabled' => $request->user()->hasTwoFactorEnabled(),
             ],
         ]);
     }

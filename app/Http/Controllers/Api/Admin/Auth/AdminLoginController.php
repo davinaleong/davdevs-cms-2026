@@ -28,6 +28,7 @@ class AdminLoginController extends Controller
                 'token' => $admin->createToken('admin-api-token')->plainTextToken,
                 'admin' => $admin,
                 'must_change_password' => $admin->must_change_password,
+                'two_factor_enabled' => $admin->hasTwoFactorEnabled(),
             ],
         ]);
     }

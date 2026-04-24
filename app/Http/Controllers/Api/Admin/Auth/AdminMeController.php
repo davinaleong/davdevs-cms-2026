@@ -21,6 +21,7 @@ class AdminMeController extends Controller
             'data' => [
                 'admin' => $request->user(),
                 'must_change_password' => $request->user()->must_change_password,
+                'two_factor_enabled' => $request->user()->hasTwoFactorEnabled(),
             ],
         ]);
     }

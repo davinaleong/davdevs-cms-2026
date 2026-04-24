@@ -27,6 +27,7 @@ class LoginController extends Controller
             'data' => [
                 'token' => $user->createToken('api-token')->plainTextToken,
                 'user' => $user,
+                'two_factor_enabled' => $user->hasTwoFactorEnabled(),
             ],
         ]);
     }

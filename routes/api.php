@@ -3,11 +3,15 @@
 use App\Http\Controllers\Api\Admin\Auth\AdminForcePasswordChangeController;
 use App\Http\Controllers\Api\Admin\Auth\AdminLoginController;
 use App\Http\Controllers\Api\Admin\Auth\AdminMeController;
+use App\Http\Controllers\Api\Admin\Auth\AdminTwoFactorSetupController;
+use App\Http\Controllers\Api\Admin\Auth\AdminTwoFactorVerifyController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\SendEmailVerificationController;
+use App\Http\Controllers\Api\Auth\TwoFactorSetupController;
+use App\Http\Controllers\Api\Auth\TwoFactorVerifyController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PostLikeToggleController;
@@ -25,6 +29,8 @@ Route::prefix('auth')->group(function (): void {
     Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['auth:sanctum', 'signed', 'throttle:6,1'])
         ->name('api.verification.verify');
+    Route::post('/2fa/setup', TwoFactorSetupController::class)->middleware('auth:sanctum');
+    Route::post('/2fa/verify', TwoFactorVerifyController::class)->middleware('auth:sanctum');
 });
 
 Route::prefix('admin/auth')->group(function (): void {
@@ -32,6 +38,8 @@ Route::prefix('admin/auth')->group(function (): void {
     Route::middleware(['auth:sanctum', 'admin'])->group(function (): void {
         Route::get('/me', AdminMeController::class);
         Route::post('/force-password-change', AdminForcePasswordChangeController::class);
+        Route::post('/2fa/setup', AdminTwoFactorSetupController::class);
+        Route::post('/2fa/verify', AdminTwoFactorVerifyController::class);
     });
 });
 

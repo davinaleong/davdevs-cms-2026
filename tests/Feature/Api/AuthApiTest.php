@@ -1,7 +1,10 @@
 <?php
 
+use App\Models\Admin;
 use App\Models\User;
+use App\Support\Security\TotpService;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
@@ -41,7 +44,8 @@ it('logs in a user with valid credentials', function () {
 
     $response
         ->assertSuccessful()
-        ->assertJsonPath('data.user.email', 'john@example.com');
+        ->assertJsonPath('data.user.email', 'john@example.com')
+        ->assertJsonPath('data.two_factor_enabled', false);
 });
 
 it('rejects invalid login credentials', function () {
@@ -67,7 +71,8 @@ it('returns the authenticated user', function () {
     $response
         ->assertSuccessful()
         ->assertJsonPath('data.user.id', $user->id)
-        ->assertJsonPath('data.email_verified', true);
+        ->assertJsonPath('data.email_verified', true)
+        ->assertJsonPath('data.two_factor_enabled', false);
 });
 
 it('logs out and revokes the current token', function () {
@@ -107,4 +112,61 @@ it('verifies email using signed url', function () {
 
     $response->assertSuccessful()->assertJsonPath('data.verified', true);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+});
+
+it('sets up two factor authentication for users', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $response = postJson('/api/auth/2fa/setup');
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonPath('data.two_factor_enabled', false)
+        ->assertJsonCount(8, 'data.recovery_codes');
+
+    $secret = $response->json('data.secret');
+    $recoveryCode = $response->json('data.recovery_codes.0');
+
+    expect($secret)->not->toBeEmpty();
+    expect($response->json('data.otpauth_url'))->toContain('otpauth://totp/');
+
+    $refreshedUser = $user->fresh();
+
+    expect($refreshedUser->two_factor_confirmed_at)->toBeNull();
+    expect($refreshedUser->getRawOriginal('two_factor_secret'))->not->toBe($secret);
+    expect($refreshedUser->two_factor_recovery_codes)->toHaveCount(8);
+    expect(Hash::check($recoveryCode, $refreshedUser->two_factor_recovery_codes[0]))->toBeTrue();
+});
+
+it('verifies user two factor authentication code', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $setupResponse = postJson('/api/auth/2fa/setup');
+    $secret = $setupResponse->json('data.secret');
+
+    $code = app(TotpService::class)->currentCode($secret);
+
+    $verifyResponse = postJson('/api/auth/2fa/verify', [
+        'code' => $code,
+    ]);
+
+    $verifyResponse
+        ->assertSuccessful()
+        ->assertJsonPath('data.two_factor_enabled', true);
+
+    expect($user->fresh()->two_factor_confirmed_at)->not->toBeNull();
+});
+
+it('rejects admin token on user two factor endpoints', function () {
+    Sanctum::actingAs(Admin::factory()->create());
+
+    $setupResponse = postJson('/api/auth/2fa/setup');
+    $verifyResponse = postJson('/api/auth/2fa/verify', [
+        'code' => '123456',
+    ]);
+
+    $setupResponse->assertForbidden();
+    $verifyResponse->assertForbidden();
 });
