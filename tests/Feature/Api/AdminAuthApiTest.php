@@ -48,6 +48,18 @@ it('rejects user token on admin me endpoint', function () {
     $response->assertForbidden();
 });
 
+it('rejects user token on admin force password change endpoint', function () {
+    Sanctum::actingAs(User::factory()->create());
+
+    $response = postJson('/api/admin/auth/force-password-change', [
+        'current_password' => 'password123',
+        'password' => 'newpassword123',
+        'password_confirmation' => 'newpassword123',
+    ]);
+
+    $response->assertForbidden();
+});
+
 it('forces admin password change and clears flag', function () {
     $admin = Admin::factory()->create([
         'password' => 'password123',

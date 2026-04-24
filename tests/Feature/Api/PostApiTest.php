@@ -1,10 +1,12 @@
 <?php
 
 use App\Enums\PostType;
+use App\Models\Admin;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\NewPostPublishedNotification;
 use Illuminate\Support\Facades\Notification;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -43,6 +45,8 @@ it('shows a published post by slug', function () {
 });
 
 it('creates a post with meta and blocks', function () {
+    Sanctum::actingAs(Admin::factory()->create());
+
     $response = postJson('/api/posts', [
         'title' => 'Building an API CMS',
         'post_type' => PostType::Project->value,
@@ -82,6 +86,8 @@ it('creates a post with meta and blocks', function () {
 });
 
 it('updates a post', function () {
+    Sanctum::actingAs(Admin::factory()->create());
+
     $post = Post::factory()->create([
         'status' => 'draft',
     ]);
@@ -99,6 +105,8 @@ it('updates a post', function () {
 });
 
 it('deletes a post', function () {
+    Sanctum::actingAs(Admin::factory()->create());
+
     $post = Post::factory()->create();
 
     $response = deleteJson('/api/posts/'.$post->slug);
@@ -109,6 +117,8 @@ it('deletes a post', function () {
 
 it('notifies verified users when a post is published', function () {
     Notification::fake();
+
+    Sanctum::actingAs(Admin::factory()->create());
 
     $verifiedUser = User::factory()->create();
     $unverifiedUser = User::factory()->unverified()->create();
@@ -127,4 +137,30 @@ it('notifies verified users when a post is published', function () {
 
     Notification::assertSentTo($verifiedUser, NewPostPublishedNotification::class);
     Notification::assertNotSentTo($unverifiedUser, NewPostPublishedNotification::class);
+});
+
+it('requires authentication to create posts', function () {
+    $response = postJson('/api/posts', [
+        'title' => 'Blocked post',
+        'post_type' => PostType::Project->value,
+        'slug' => 'blocked-post',
+        'content_md' => '# Blocked',
+        'status' => 'draft',
+    ]);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects user tokens for post creation', function () {
+    Sanctum::actingAs(User::factory()->create());
+
+    $response = postJson('/api/posts', [
+        'title' => 'Blocked post',
+        'post_type' => PostType::Project->value,
+        'slug' => 'blocked-post-user',
+        'content_md' => '# Blocked',
+        'status' => 'draft',
+    ]);
+
+    $response->assertForbidden();
 });

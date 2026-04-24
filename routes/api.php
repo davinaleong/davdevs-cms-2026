@@ -29,12 +29,19 @@ Route::prefix('auth')->group(function (): void {
 
 Route::prefix('admin/auth')->group(function (): void {
     Route::post('/login', AdminLoginController::class);
-    Route::get('/me', AdminMeController::class)->middleware('auth:sanctum');
-    Route::post('/force-password-change', AdminForcePasswordChangeController::class)->middleware('auth:sanctum');
+    Route::middleware(['auth:sanctum', 'admin'])->group(function (): void {
+        Route::get('/me', AdminMeController::class);
+        Route::post('/force-password-change', AdminForcePasswordChangeController::class);
+    });
 });
 
 Route::get('/post-types', PostTypeController::class);
 Route::get('/jokes/random', RandomJokeController::class);
+Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{post:slug}', [PostController::class, 'show']);
-Route::apiResource('posts', PostController::class)->except(['show']);
+Route::middleware(['auth:sanctum', 'admin'])->group(function (): void {
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::put('/posts/{post:slug}', [PostController::class, 'update']);
+    Route::delete('/posts/{post:slug}', [PostController::class, 'destroy']);
+});
 Route::post('/posts/{post:slug}/likes/toggle', PostLikeToggleController::class)->middleware('auth:sanctum');

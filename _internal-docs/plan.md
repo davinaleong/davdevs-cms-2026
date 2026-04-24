@@ -7,6 +7,7 @@
 - [x] Iteration 3 (2026-04-24): Implemented Likes engagement system (likes table, authenticated toggle endpoint, post like count in API, JS UI button + guest state) with passing Pest coverage.
 - [x] Iteration 4 (2026-04-24): Implemented Phase 5 auth API (register/login/logout/me), email verification flow, and queued new-post notifications to verified users with passing Pest coverage.
 - [x] Iteration 5 (2026-04-24): Implemented Phase 6 admin auth foundation with separate admin provider/guard, admins table, default admin seeder, and force-password-change API with passing Pest coverage.
+- [x] Iteration 6 (2026-04-24): Hardened API authorization with reusable `admin` middleware and protected admin endpoints plus post write routes, with updated passing Pest coverage.
 
 **Goal: Set up a stable base you won’t regret later**
 
@@ -158,7 +159,7 @@
 
 * [x] Create `admins` table
 * [x] Configure guard
-* [ ] Seeder:
+* [x] Seeder:
 
   * [x] Default admin account
   * [x] Force password change
