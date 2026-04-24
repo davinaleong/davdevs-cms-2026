@@ -1,19 +1,23 @@
 # 🚀 PHASE 0 — Foundation (Don’t skip this)
 
+## Progress Log
+
+- [x] Iteration 1 (2026-04-24): API scaffolding with Sanctum, UUID base model strategy, core CMS schema/models, post API CRUD, Blade post rendering, and passing Pest tests for API + web routes.
+
 **Goal: Set up a stable base you won’t regret later**
 
 ### ✅ Project Setup
 
-* [ ] Initialize Laravel project
-* [ ] Configure UUIDs globally (models + migrations)
-* [ ] Set up environment (DB, mail, queue)
+* [x] Initialize Laravel project
+* [x] Configure UUIDs globally (models + migrations)
+* [x] Set up environment (DB, mail, queue)
 * [ ] Install auth starter (Laravel Breeze or Fortify)
 
 ### ✅ Core Architecture Decisions
 
-* [ ] Decide: REST or GraphQL (you can start REST)
-* [ ] Define post types enum (`project`, `tool`, `joke`, etc.)
-* [ ] Decide JSON structure for `post_blocks`
+* [x] Decide: REST or GraphQL (you can start REST)
+* [x] Define post types enum (`project`, `tool`, `joke`, etc.)
+* [x] Decide JSON structure for `post_blocks`
 
 ---
 
@@ -23,23 +27,23 @@
 
 ### ✅ Database
 
-* [ ] Create `posts` table
-* [ ] Create `post_meta` table (SEO)
-* [ ] Create `post_blocks` table (structured content)
-* [ ] Add indexes (slug, type, status)
+* [x] Create `posts` table
+* [x] Create `post_meta` table (SEO)
+* [x] Create `post_blocks` table (structured content)
+* [x] Add indexes (slug, type, status)
 
 ### ✅ Models
 
-* [ ] Post model (UUID, relationships)
-* [ ] PostMeta model
-* [ ] PostBlock model
+* [x] Post model (UUID, relationships)
+* [x] PostMeta model
+* [x] PostBlock model
 
 ### ✅ Admin CRUD (Basic)
 
-* [ ] Create post (title, type, slug)
-* [ ] Edit post
-* [ ] Delete post
-* [ ] Publish/unpublish toggle
+* [x] Create post (title, type, slug)
+* [x] Edit post
+* [x] Delete post
+* [x] Publish/unpublish toggle
 
 ---
 
@@ -49,22 +53,22 @@
 
 ### ✅ Routing
 
-* [ ] `/posts/{slug}` route
-* [ ] Controller to fetch post + blocks + meta
+* [x] `/posts/{slug}` route
+* [x] Controller to fetch post + blocks + meta
 
 ### ✅ Dynamic Rendering
 
-* [ ] Create `posts/{type}.blade.php`
-* [ ] Implement block renderer:
+* [x] Create `posts/{type}.blade.php`
+* [x] Implement block renderer:
 
-  * [ ] `@include("blocks.{type}")`
-* [ ] Build base layout (SEO-ready)
+  * [x] `@include("blocks.{type}")`
+* [x] Build base layout (SEO-ready)
 
 ### ✅ SEO Metadata
 
-* [ ] Meta title + description
-* [ ] Open Graph tags
-* [ ] Canonical URL support
+* [x] Meta title + description
+* [x] Open Graph tags
+* [x] Canonical URL support
 
 ---
 
@@ -185,9 +189,9 @@
 
 ### API
 
-* [ ] `/api/posts`
-* [ ] `/api/posts/{slug}`
-* [ ] `/api/posts?type=project`
+* [x] `/api/posts`
+* [x] `/api/posts/{slug}`
+* [x] `/api/posts?type=project`
 
 ### Optional (Later)
 
@@ -266,13 +270,13 @@
 
 # 🧪 PHASE 12 — Testing
 
-* [ ] Feature tests for:
+* [x] Feature tests for:
 
-  * [ ] Post CRUD
+  * [x] Post CRUD
   * [ ] Auth
   * [ ] Likes
 * [ ] Unit tests for models
-* [ ] API tests
+* [x] API tests
 
 ---
 
